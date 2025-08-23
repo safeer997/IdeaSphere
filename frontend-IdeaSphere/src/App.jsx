@@ -1,11 +1,11 @@
 import './App.css';
+import Signup from './pages/auth/Signup.jsx';
 
 function App() {
   return (
-    <div>
-      <h1>Welcome To IdeaSphere !</h1>
-      <p>Your ideas, your space.</p>
-    </div>
+    <>
+      <Signup />
+    </>
   );
 }
 
