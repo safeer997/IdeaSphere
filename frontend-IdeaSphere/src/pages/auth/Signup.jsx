@@ -1,6 +1,6 @@
 import React from 'react';
 import styles from './Signup.module.css';
-import logo from '../../assets/icons/logo.svg';
+import logo from '../../assets/icons/logo.png';
 import { useState } from 'react';
 
 function Signup() {
@@ -24,7 +24,7 @@ function Signup() {
               placeholder={useEmail ? 'Email' : 'Phone number'}
             />
           </div>
-          <p onClick={handleUseEmailClick}>
+          <p className={styles.paragraph} onClick={handleUseEmailClick}>
             {useEmail ? 'Use phone number' : 'Use email'}
           </p>
           <button>Next</button>

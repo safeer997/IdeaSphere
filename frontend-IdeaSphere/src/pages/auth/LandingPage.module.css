@@ -1,3 +1,90 @@
-.test{
-  background-color : green ;
+.container {
+  display: flex;
+  height: 100vh;
+  width: 100%;
+  font-family: Arial, sans-serif;
+}
+
+
+.imagepanel {
+  flex: 2.5;
+  background-color: #1d9bf0; /* fallback if image doesn't load */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+}
+
+.imagepanel img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.signuppanel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 40px;
+}
+
+.header img {
+  width: 240px;
+  /*  temp fix until use svg */
+  margin-left: -20px;
+}
+
+.header h1 {
+  font-size: 32px;
+  font-weight: 800;
+  margin-bottom: 20px;
+  line-height: 1.1;
+}
+
+.header h3 {
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 30px;
+}
+
+.buttons {
+  display: flex;
+  flex-direction: column;
+}
+
+.button {
+  background-color: #fff;
+  color: #0f1419;
+  border: 1px solid #cfd9de;
+  padding: 8px 24px;
+  border-radius: 9999px;
+  font-size: 15px;
+  font-weight: 700;
+  margin-bottom: 12px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 40px;
+  width: 100%;
+  max-width: 300px;
+}
+
+.button:hover {
+  background-color: #f7f9fa;
+}
+
+.footer {
+  margin-top: 40px;
+}
+
+.paragraph {
+  color: #536471;
+  font-size: 10px;
+}
+
+.paragraph span {
+  color: #1d9bf0;
+  cursor: pointer;
 }
