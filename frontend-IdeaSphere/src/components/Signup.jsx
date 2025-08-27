@@ -1,17 +1,24 @@
 import React from 'react';
 import styles from './Signup.module.css';
-import logo from '../../assets/icons/logo.png';
+import logo from '../assets/icons/logo.png';
 import { useState } from 'react';
 
-function Signup() {
+function Signup({ setSignupOptions, setIsLoggingIn ,setIsSigningUp }) {
   const [useEmail, setUseEmail] = useState(false);
 
   function handleUseEmailClick() {
     setUseEmail(!useEmail);
   }
+
+  function handleAlreadyHaveAnAccount() {
+    setSignupOptions(true);
+    setIsLoggingIn(false);
+    setIsSigningUp(false)
+  }
+
   return (
     <div className={styles.container}>
-      <div className={styles.card}>
+      <div>
         <div className={styles.logo}>
           <img className={styles.logoImg} src={logo} alt='Logo' />
         </div>
@@ -24,10 +31,13 @@ function Signup() {
               placeholder={useEmail ? 'Email' : 'Phone number'}
             />
           </div>
-          <p className={styles.paragraph} onClick={handleUseEmailClick}>
+          <span className={styles.span} onClick={handleUseEmailClick}>
             {useEmail ? 'Use phone number' : 'Use email'}
-          </p>
+          </span>
           <button>Next</button>
+          <span className={styles.span} onClick={handleAlreadyHaveAnAccount}>
+            Already have an account ?
+          </span>
         </div>
       </div>
     </div>

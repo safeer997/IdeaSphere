@@ -1,0 +1,78 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  font-family: Arial, sans-serif;
+  background-color: #fff;
+}
+
+.formsection {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start; /* ✅ Aligns logo + h1 to left */
+  width: 100%;
+  max-width: 400px;
+}
+
+.formsection img {
+  width: 240px;
+  margin-left: -22px;
+  margin-bottom: 20px;
+}
+
+.formsection h1 {
+  font-size: 28px;
+  font-weight: 700;
+  margin-bottom: 20px;
+  text-align: left; /* ✅ Align text left */
+  color: #0f1419;
+  width: 100%;
+}
+
+.formsection input {
+  width: 100%;
+  padding: 15px;
+  margin-bottom: 15px;
+  border: 1px solid #cfd9de;
+  border-radius: 6px;
+  font-size: 16px;
+  outline: none;
+}
+
+.formsection input:focus {
+  border-color: #1d9bf0;
+  box-shadow: 0 0 0 1px #1d9bf0;
+}
+
+.formsection button {
+  width: 100%;
+  background-color: #1d9bf0;
+  color: white;
+  border: none;
+  border-radius: 9999px;
+  padding: 14px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  margin-top: 10px;
+}
+
+.formsection button:hover {
+  background-color: #1a8cd8;
+}
+
+.footer {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  max-width: 400px;
+  margin-top: 20px;
+  font-size: 15px;
+}
+
+.footer span {
+  color: #1d9bf0;
+  cursor: pointer;
+}
