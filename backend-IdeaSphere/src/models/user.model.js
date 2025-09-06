@@ -4,7 +4,7 @@ const userSchema = new Schema(
   {
     name: {
       type: String,
-      trim: true,                                               
+      trim: true,
       unique: true,
       lowercase: true,
     },
@@ -17,6 +17,12 @@ const userSchema = new Schema(
       type: String,
     },
     password: {
+      type: String,
+    },
+    googleId: {
+      type: String,
+    },
+    avatar: {
       type: String,
     },
   },
