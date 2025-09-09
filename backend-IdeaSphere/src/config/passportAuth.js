@@ -1,7 +1,9 @@
+import dotenv from 'dotenv';
+dotenv.config(); // load env immediately at the top to avpoid cliedid error from google
 import passport from 'passport';
 import { Strategy as LocalStrategy } from 'passport-local';
 import { Strategy as GoogleStrategy } from 'passport-google-oauth20';
-import { User } from '../models/User.js'; // adjust path
+import { User } from '../models/user.model.js'; 
 
 passport.use(
   new LocalStrategy(
@@ -31,7 +33,7 @@ passport.use(
     {
       clientID: process.env.GOOGLE_CLIENT_ID,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-      callbackURL: '/auth/google/callback', // must match Google Cloud Console
+      callbackURL: '/api/v1/auth/google/callback', 
     },
     async (accessToken, refreshToken, profile, done) => {
       try {
@@ -55,7 +57,7 @@ passport.use(
 );
 
 passport.serializeUser((user, done) => {
-  done(null, user._id); // store MongoDB _id
+  done(null, user._id); 
 });
 
 passport.deserializeUser(async (_id, done) => {

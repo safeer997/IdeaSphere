@@ -1,15 +1,17 @@
-import express from 'express';
 import dotenv from 'dotenv';
-import { connectDb } from './config/db.js';
-//routes
-import userRoutes from './routes/user.route.js';
-import passport from 'passport';
-import session from "express"
-
 dotenv.config();
+import express from 'express';
+import { connectDb } from './config/db.js';
+import session from 'express-session';
+import passport from './config/passportAuth.js';
+
+// routes
+import userRoutes from './routes/user.route.js';
+import authRoutes from './routes/auth.route.js';
 
 const app = express();
 app.use(express.json());
+
 app.use(
   session({
     secret: process.env.SESSION_SECRET,
@@ -17,18 +19,20 @@ app.use(
     saveUninitialized: false,
   })
 );
+
+
 app.use(passport.initialize());
 app.use(passport.session());
 
-
-//routes
+// routes
 app.use('/api/v1/users', userRoutes);
+app.use('/api/v1/auth', authRoutes);
 
 const PORT = process.env.PORT || 4000;
 try {
   await connectDb();
   app.listen(PORT, () => {
-    console.log(`Server running on port:${PORT}`);
+    console.log(`🚀 Server running on http://localhost:${PORT}`);
   });
 } catch (error) {
   console.log(error);
