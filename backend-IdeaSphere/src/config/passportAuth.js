@@ -3,7 +3,8 @@ dotenv.config(); // load env immediately at the top to avpoid cliedid error from
 import passport from 'passport';
 import { Strategy as LocalStrategy } from 'passport-local';
 import { Strategy as GoogleStrategy } from 'passport-google-oauth20';
-import { User } from '../models/user.model.js'; 
+import { User } from '../models/user.model.js';
+import { verifyPassword } from '../services/auth.service.js';
 
 passport.use(
   new LocalStrategy(
@@ -15,7 +16,9 @@ passport.use(
           return done(null, false, { message: 'User not found' });
         }
 
-        const isMatch = await user.verifyPassword(password); // make sure verifyPassword is async
+        const userPassword = user.password;
+
+        const isMatch = await verifyPassword(password, userPassword);
         if (!isMatch) {
           return done(null, false, { message: 'Incorrect password' });
         }
@@ -28,12 +31,13 @@ passport.use(
   )
 );
 
+//step 1
 passport.use(
   new GoogleStrategy(
     {
       clientID: process.env.GOOGLE_CLIENT_ID,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-      callbackURL: '/api/v1/auth/google/callback', 
+      callbackURL: '/api/v1/auth/google/callback',
     },
     async (accessToken, refreshToken, profile, done) => {
       try {
@@ -57,7 +61,7 @@ passport.use(
 );
 
 passport.serializeUser((user, done) => {
-  done(null, user._id); 
+  done(null, user._id);
 });
 
 passport.deserializeUser(async (_id, done) => {

@@ -7,12 +7,11 @@ router.get(
   '/google',
   passport.authenticate('google', {
     scope: ['profile', 'email'],
-    prompt: 'consent',      // ⚡ forces consent screen every time
-    accessType: 'offline',  // optional, if you need refresh tokens
+    prompt: 'consent',     
+    accessType: 'offline',  
   })
 );
 
-// Step 2: Google callback (return full user object)
 router.get('/google/callback', (req, res, next) => {
   passport.authenticate('google', (err, user) => {
     if (err) {
