@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import passport from '../config/passportAuth.js';
+import { handleAuthCallback } from '../services/auth.service.js';
 
 const router = Router();
 
@@ -7,35 +8,20 @@ router.get(
   '/google',
   passport.authenticate('google', {
     scope: ['profile', 'email'],
-    prompt: 'consent',     
-    accessType: 'offline',  
+    prompt: 'consent',
+    accessType: 'offline',
   })
 );
 
-router.get('/google/callback', (req, res, next) => {
-  passport.authenticate('google', (err, user) => {
-    if (err) {
-      return res.status(500).json({
-        success: false,
-        message: 'Server error',
-        error: err.message,
-      });
-    }
-    if (!user) {
-      return res.status(401).json({
-        success: false,
-        message: 'Google login failed',
-      });
-    }
+router.get('/google/callback', handleAuthCallback('google'));
 
-    console.log('user:', user);
+router.get(
+  '/github',
+  passport.authenticate('github', { scope: ['user:email'] })
+);
 
-    return res.status(200).json({
-      success: true,
-      message: 'Google login success',
-      data: user,
-    });
-  })(req, res, next);
-});
+router.get('/github/callback', handleAuthCallback('github'));
+
+router.post('/login', handleAuthCallback('local'));
 
 export default router;

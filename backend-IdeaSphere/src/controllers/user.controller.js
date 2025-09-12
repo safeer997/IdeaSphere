@@ -8,20 +8,29 @@ export async function createUser(req, res) {
     if ((!email && !phoneNumber) || !password) {
       return res.status(401).json({
         success: false,
-        message: 'Password and email or number are required',
+        message: 'Password and either email or number are required',
       });
     }
 
-    //check if usewr already exists
-    const existedUser = await User.findOne({
-      $or: [{ phoneNumber }, { email }],
-    });
+    //check if usewr already exists by email
+    if (email) {
+      const existedUser = await User.findOne({ email: email });
+      if (existedUser) {
+        return res.status(401).json({
+          success: false,
+          message: 'user already exists with given email',
+        });
+      }
+    }
 
-    if (existedUser) {
-      return res.status(401).json({
-        success: false,
-        message: 'user already exists with given credentials',
-      });
+    if (phoneNumber) {
+      const existedUser = await User.findOne({ phoneNumber: phoneNumber });
+      if (existedUser) {
+        return res.status(401).json({
+          success: false,
+          message: 'user already exists with given number',
+        });
+      }
     }
 
     //create a user but we need to hash password first
@@ -29,12 +38,21 @@ export async function createUser(req, res) {
     const hashedPassword = await hashPassword(password);
 
     //create user in db
-
-    const createdUser = await User.create({
-      phoneNumber: phoneNumber || '',
-      email: email || '',
+    //
+    const userData = {
       password: hashedPassword,
-    });
+    };
+
+    //we all dynamically add property bcs we are getting either email or number on signup
+
+    if (email) {
+      userData.email = email;
+    }
+    if (phoneNumber) {
+      userData.phoneNumber = phoneNumber;
+    }
+
+    const createdUser = await User.create(userData);
 
     if (!createdUser) {
       return res.status(500).json({
