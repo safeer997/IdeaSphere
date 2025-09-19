@@ -8,6 +8,10 @@ function Login({ setSignupOptions, setIsLoggingIn }) {
     setSignupOptions(true);
   }
   function handleForgotClick() {}
+
+  function handleLogin(){
+    
+  }
   return (
     <>
       <div className={styles.container}>
@@ -16,6 +20,7 @@ function Login({ setSignupOptions, setIsLoggingIn }) {
           <h1>Log in to IdeaSphere</h1>
           <input type='text' placeholder='Phone number, email address'></input>
           <input type='text' placeholder='Password'></input>
+          <button onClick={handleLogin}>Log in</button>
         </div>
         <div className={styles.footer}>
           <span onClick={handleForgotClick}>Forgot password ?</span>
