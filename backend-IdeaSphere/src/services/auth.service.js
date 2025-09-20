@@ -14,7 +14,7 @@ export async function verifyPassword(plainPassword, hashPassword) {
 // callback handler for passport authentication
 export function handleAuthCallback(strategy) {
   return function (req, res, next) {
-    passport.authenticate(strategy, function (err, user) {
+    passport.authenticate(strategy, function (err, user, info) {
       if (err) {
         return res.status(500).json({
           success: false,
@@ -26,7 +26,7 @@ export function handleAuthCallback(strategy) {
       if (!user) {
         return res.status(401).json({
           success: false,
-          message: `${strategy} login failed`,
+          message: info?.message || 'Authentication failed',
         });
       }
 

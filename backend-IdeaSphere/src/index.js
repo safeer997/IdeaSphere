@@ -4,6 +4,7 @@ import express from 'express';
 import { connectDb } from './config/db.js';
 import session from 'express-session';
 import passport from './config/passportAuth.js';
+import cors from 'cors';
 
 // routes
 import userRoutes from './routes/user.route.js';
@@ -20,6 +21,12 @@ app.use(
   })
 );
 
+app.use(
+  cors({
+    origin: ['http://localhost:5173'],
+    credentials: true,
+  })
+);
 
 app.use(passport.initialize());
 app.use(passport.session());

@@ -5,7 +5,7 @@ export async function login(identifier, password) {
   };
   try {
     const response = await fetch('http://localhost:7000/api/v1/auth/login', {
-      method: 'POST',
+      method:'POST',
       headers: {
         'Content-Type': 'application/json',
       },
@@ -13,7 +13,10 @@ export async function login(identifier, password) {
     });
 
     if (!response.ok) {
-      throw new Error('Error in logging in');
+      const errorDetails = await response.json().catch(() => {});
+      throw new Error(
+        errorDetails.message || `Login failed with status ${response.status}`
+      );
     }
 
     const data = await response.json();
@@ -22,4 +25,3 @@ export async function login(identifier, password) {
     console.log('error in login api:', error);
   }
 }
-
