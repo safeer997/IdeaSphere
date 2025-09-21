@@ -1,10 +1,13 @@
 import React from 'react';
 import styles from './Signup.module.css';
 import logo from '../assets/icons/logo.png';
-import { useState } from 'react';
+import { useState, useRef } from 'react';
+import { signUp } from '../features/authApi.js';
 
-function Signup({ setSignupOptions, setIsLoggingIn ,setIsSigningUp }) {
+function Signup({ setSignupOptions, setIsLoggingIn, setIsSigningUp }) {
   const [useEmail, setUseEmail] = useState(false);
+  const identifier = useRef('');
+  const password = useRef('');
 
   function handleUseEmailClick() {
     setUseEmail(!useEmail);
@@ -13,7 +16,26 @@ function Signup({ setSignupOptions, setIsLoggingIn ,setIsSigningUp }) {
   function handleAlreadyHaveAnAccount() {
     setSignupOptions(true);
     setIsLoggingIn(false);
-    setIsSigningUp(false)
+    setIsSigningUp(false);
+  }
+
+  async function handleSignup() {
+    const identifierInput = identifier.current.value;
+    const passwordInput = password.current.value;
+
+    if (!identifierInput || !passwordInput) {
+      console.log('Input field can not be empty');
+    }
+
+    if (useEmail) {
+      const email = identifierInput;
+      const response = await signUp(email, '', passwordInput);
+      console.log('res in signup by email :', response);
+    } else {
+      const phoneNumber = identifierInput;
+      const response = await signUp('', phoneNumber, passwordInput);
+      console.log('res in signup by phone :', response);
+    }
   }
 
   return (
@@ -25,16 +47,17 @@ function Signup({ setSignupOptions, setIsLoggingIn ,setIsSigningUp }) {
         <div className={styles.form}>
           <h1>Create an account</h1>
           <div className={styles.inputbox}>
-            <input type='text' placeholder='Name' />
             <input
+              ref={identifier}
               type='text'
               placeholder={useEmail ? 'Email' : 'Phone number'}
             />
+            <input ref={password} type='text' placeholder='password' />
           </div>
           <span className={styles.span} onClick={handleUseEmailClick}>
             {useEmail ? 'Use phone number' : 'Use email'}
           </span>
-          <button>Next</button>
+          <button onClick={handleSignup}>Sign up</button>
           <span className={styles.span} onClick={handleAlreadyHaveAnAccount}>
             Already have an account ?
           </span>

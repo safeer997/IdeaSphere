@@ -6,6 +6,7 @@ const userSchema = new Schema(
       type: String,
       trim: true,
       unique: true,
+      sparse: true,
     },
     phoneNumber: {
       type: String,

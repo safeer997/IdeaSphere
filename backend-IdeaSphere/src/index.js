@@ -32,7 +32,7 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 // routes
-app.use('/api/v1/users', userRoutes);
+app.use('/api/v1/user', userRoutes);
 app.use('/api/v1/auth', authRoutes);
 
 const PORT = process.env.PORT || 4000;

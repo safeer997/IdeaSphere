@@ -18,7 +18,7 @@ function Login({ setSignupOptions, setIsLoggingIn }) {
     const identifierInput = identifier.current.value;
     const passwordInput = password.current.value;
     if (!identifierInput || !passwordInput) {
-      conole.log('Input field can not be empty');
+      console.log('Input field can not be empty');
     }
     const response = await login(identifierInput, passwordInput);
     console.log('res in login :', response);
