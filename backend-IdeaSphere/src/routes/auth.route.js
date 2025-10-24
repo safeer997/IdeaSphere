@@ -1,9 +1,20 @@
+// routes/index.js
 import { Router } from 'express';
 import passport from '../config/passportAuth.js';
-import { handleAuthCallback } from '../services/auth.service.js';
+import { handleAuthCallback, logoutUser, getMe } from '../services/auth.service.js';
+import { createUser } from '../controllers/user.controller.js';
+import { verifyToken } from '../middlewares/verifyToken.js';
 
 const router = Router();
 
+// -------------------- User Signup --------------------
+router.post('/signup', createUser);
+
+// -------------------- Local Login --------------------
+router.post('/login', handleAuthCallback('local'));
+
+// -------------------- OAuth Routes --------------------
+// Google
 router.get(
   '/google',
   passport.authenticate('google', {
@@ -12,16 +23,16 @@ router.get(
     accessType: 'offline',
   })
 );
-
 router.get('/google/callback', handleAuthCallback('google'));
 
-router.get(
-  '/github',
-  passport.authenticate('github', { scope: ['user:email'] })
-);
-
+// GitHub
+router.get('/github', passport.authenticate('github', { scope: ['user:email'] }));
 router.get('/github/callback', handleAuthCallback('github'));
 
-router.post('/login', handleAuthCallback('local'));
+// -------------------- Logout --------------------
+router.post('/logout', logoutUser);
+
+// -------------------- Get Current User --------------------
+router.get('/me', verifyToken, getMe);
 
 export default router;

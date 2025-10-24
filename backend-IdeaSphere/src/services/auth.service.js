@@ -1,24 +1,34 @@
 import bcrypt from 'bcryptjs';
 import passport from '../config/passportAuth.js';
+import jwt from 'jsonwebtoken';
 
+// Hash password
 export async function hashPassword(password) {
-  const hashedPassword = await bcrypt.hash(password, 10);
-  return hashedPassword;
+  return await bcrypt.hash(password, 10);
 }
 
+// Verify password
 export async function verifyPassword(plainPassword, hashPassword) {
-  const isMatch = await bcrypt.compare(plainPassword, hashPassword);
-  return isMatch;
+  return await bcrypt.compare(plainPassword, hashPassword);
 }
 
-// callback handler for passport authentication
+// Create JWT
+function createToken(user) {
+  return jwt.sign(
+    { id: user._id, email: user.email },
+    process.env.JWT_SECRET,
+    { expiresIn: '1d' }
+  );
+}
+
+// Unified handler for Passport callbacks
 export function handleAuthCallback(strategy) {
   return function (req, res, next) {
-    passport.authenticate(strategy, function (err, user, info) {
+    passport.authenticate(strategy, async (err, user, info) => {
       if (err) {
         return res.status(500).json({
           success: false,
-          message: `Server error while ${strategy} auth`,
+          message: `Server error during ${strategy} auth`,
           error: err.message,
         });
       }
@@ -30,11 +40,46 @@ export function handleAuthCallback(strategy) {
         });
       }
 
-      return res.status(200).json({
-        success: true,
-        message: `${strategy} login success`,
-        data: user,
-      });
+      try {
+        // Generate JWT
+        const token = createToken(user);
+
+        // Set JWT cookie
+        res.cookie('token', token, {
+          httpOnly: true,
+          secure: false, // true in production with HTTPS
+          sameSite: 'lax',
+        });
+
+        if (strategy === 'local') {
+          // Local login: return JSON
+          return res.status(200).json({
+            success: true,
+            message: 'Login successful',
+            data: { id: user._id, email: user.email, name: user.username },
+          });
+        }
+
+        // OAuth login: redirect to frontend dashboard
+        return res.redirect('http://localhost:5173/dashboard');
+      } catch (err) {
+        return res.status(500).json({
+          success: false,
+          message: 'Token generation failed',
+          error: err.message,
+        });
+      }
     })(req, res, next);
   };
+}
+
+// Logout: clear JWT cookie
+export function logoutUser(req, res) {
+  res.clearCookie('token');
+  return res.status(200).json({ success: true, message: 'Logged out successfully' });
+}
+
+// Get current user info (requires verifyToken middleware)
+export function getMe(req, res) {
+  return res.status(200).json({ success: true, user: req.user });
 }

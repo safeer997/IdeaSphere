@@ -5,13 +5,11 @@ import { connectDb } from './config/db.js';
 import session from 'express-session';
 import passport from './config/passportAuth.js';
 import cors from 'cors';
-
-// routes
-import userRoutes from './routes/user.route.js';
-import authRoutes from './routes/auth.route.js';
+import cookieParser from 'cookie-parser';
 
 const app = express();
 app.use(express.json());
+app.use(cookieParser());
 
 app.use(
   session({
@@ -32,7 +30,7 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 // routes
-app.use('/api/v1/user', userRoutes);
+import authRoutes from './routes/auth.route.js';
 app.use('/api/v1/auth', authRoutes);
 
 const PORT = process.env.PORT || 4000;
