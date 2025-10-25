@@ -3,7 +3,7 @@
 // -------------------- Local Login --------------------
 export async function login(identifier, password) {
   try {
-    const response = await fetch('http://localhost:7000/api/v1/login', {
+    const response = await fetch('http://localhost:7000/api/v1/auth/login', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ identifier, password }),

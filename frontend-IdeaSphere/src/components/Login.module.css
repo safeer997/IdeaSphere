@@ -11,7 +11,7 @@
 .formsection {
   display: flex;
   flex-direction: column;
-  align-items: flex-start; /* ✅ Aligns logo + h1 to left */
+  align-items: flex-start;
   width: 100%;
   max-width: 400px;
 }
@@ -25,10 +25,36 @@
 .formsection h1 {
   font-size: 28px;
   font-weight: 700;
-  margin-bottom: 20px;
-  text-align: left; /* ✅ Align text left */
+  margin-bottom: 25px;
+  text-align: left;
   color: #0f1419;
   width: 100%;
+}
+
+/* ✅ new logindiv styling */
+.logindiv {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+  margin-bottom: 25px; /* space before input fields */
+}
+
+.logindiv .button {
+  background-color: #fff;
+  color: #0f1419;
+  border: 1px solid #cfd9de;
+  padding: 12px 24px;
+  border-radius: 9999px;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  width: 100%;
+  text-align: center;
+}
+
+.logindiv .button:hover {
+  background-color: #f7f9fa;
 }
 
 .formsection input {
@@ -68,7 +94,7 @@
   justify-content: space-between;
   width: 100%;
   max-width: 400px;
-  margin-top: 20px;
+  margin-top: 25px;
   font-size: 15px;
 }
 

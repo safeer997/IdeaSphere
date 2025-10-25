@@ -65,10 +65,10 @@ function LandingPage() {
           </div>
           <div className={styles.buttons}>
             <button onClick={handleGoogleSignup} className={styles.button}>
-              Login with Google
+              Signup with Google
             </button>
             <button onClick={handleGithubSignup} className={styles.button}>
-              Login with Github
+              Signup with Github
             </button>
             <button onClick={handleSignupClick} className={styles.button}>
               Sign up with phone or email

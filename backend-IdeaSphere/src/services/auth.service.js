@@ -2,17 +2,16 @@ import bcrypt from 'bcryptjs';
 import passport from '../config/passportAuth.js';
 import jwt from 'jsonwebtoken';
 
-// Hash password
+
 export async function hashPassword(password) {
   return await bcrypt.hash(password, 10);
 }
 
-// Verify password
 export async function verifyPassword(plainPassword, hashPassword) {
   return await bcrypt.compare(plainPassword, hashPassword);
 }
 
-// Create JWT
+
 function createToken(user) {
   return jwt.sign(
     { id: user._id, email: user.email },
@@ -55,7 +54,7 @@ export function handleAuthCallback(strategy) {
           // Local login: return JSON
           return res.status(200).json({
             success: true,
-            message: 'Login successful',
+            message: 'Local Login successful',
             data: { id: user._id, email: user.email, name: user.username },
           });
         }
