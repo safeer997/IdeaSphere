@@ -3,7 +3,7 @@ import { Router } from 'express';
 import passport from '../config/passportAuth.js';
 import { handleAuthCallback, logoutUser, getMe } from '../services/auth.service.js';
 import { createUser } from '../controllers/user.controller.js';
-import { verifyToken } from '../middlewares/verifyToken.js';
+import { verifyToken } from '../middlewares/verifyToken.middleware.js';
 
 const router = Router();
 

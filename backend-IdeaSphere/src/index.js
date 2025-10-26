@@ -31,7 +31,9 @@ app.use(passport.session());
 
 // routes
 import authRoutes from './routes/auth.route.js';
+import postRoutes from './routes/post.route.js';
 app.use('/api/v1/auth', authRoutes);
+app.use('/api/v1/post', postRoutes);
 
 const PORT = process.env.PORT || 4000;
 try {
