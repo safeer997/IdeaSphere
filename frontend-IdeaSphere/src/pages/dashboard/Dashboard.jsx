@@ -1,42 +1,69 @@
-import React, { useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useEffect, useState } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
 import { fetchUser, performLogout } from '../../features/authSlice.js';
+import { getPosts } from '../../api/postApi.js';
 import { useNavigate } from 'react-router-dom';
+import CreatePostForm from '../../components/CreatePostForm.jsx';
+import PostFeed from '../../components/PostFeed.jsx';
 import styles from './Dashboard.module.css';
 
 const Dashboard = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { user, isLoggedIn, loading } = useSelector((state) => state.auth);
+  const {
+    user,
+    isLoggedIn,
+    loading: authLoading,
+  } = useSelector((state) => state.auth);
 
-  console.log('user details : ', user);
 
-  // Fetch current user on mount
+  const [posts, setPosts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
   useEffect(() => {
     dispatch(fetchUser());
+    loadPosts();
   }, [dispatch]);
 
-  // Redirect to landing page if not logged in
-  useEffect(() => {
-    if (!loading && !isLoggedIn) {
-      navigate('/');
+  const loadPosts = async () => {
+    setLoading(true);
+    const res = await getPosts();
+    if (res.success) {
+      setPosts(res.data);
+      setError(null);
+    } else {
+      setError(res.message);
     }
-  }, [loading, isLoggedIn, navigate]);
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    if (!authLoading && !isLoggedIn) navigate('/');
+  }, [authLoading, isLoggedIn, navigate]);
 
   const handleLogout = () => {
     dispatch(performLogout());
     navigate('/');
   };
 
-  if (loading) return <div className={styles.container}>Loading...</div>;
+  const handlePostCreated = (newPost) => {
+    setPosts((prev) => [newPost, ...prev]);
+  };
+
+  if (authLoading || loading)
+    return <div className={styles.container}>Loading...</div>;
 
   return (
     <div className={styles.container}>
       <h1>Welcome, {user?.username || user?.email}</h1>
-      <p>This is your personal dashboard.</p>
       <button onClick={handleLogout} className={styles.button}>
         Logout
       </button>
+
+      <CreatePostForm onPostCreated={handlePostCreated} />
+      {error && <p style={{ color: 'red' }}>{error}</p>}
+      <PostFeed posts={posts} />
     </div>
   );
 };

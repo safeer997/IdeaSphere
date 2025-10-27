@@ -1,0 +1,33 @@
+.container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+  font-family: 'Arial', sans-serif;
+  background-color: #f5f8fa;
+  min-height: 100vh;
+}
+
+h1 {
+  margin-bottom: 16px;
+  color: #1d9bf0;
+}
+
+.button {
+  background-color: #1d9bf0;
+  color: #fff;
+  border: none;
+  border-radius: 9999px;
+  padding: 8px 20px;
+  cursor: pointer;
+  font-weight: 600;
+  margin-bottom: 20px;
+}
+
+.button:hover {
+  background-color: #0c85d0;
+}
+
+.errorMessage {
+  color: red;
+  margin-bottom: 12px;
+}

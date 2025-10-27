@@ -3,7 +3,10 @@ import { User } from '../models/user.model.js';
 
 export async function createPost(req, res) {
   const { content } = req.body;
-  const userId = req.user._id;
+  const userId = req.user.id;
+
+  console.log('content : ', content);
+  console.log('userId : ', userId);
 
   try {
     // Validate content
@@ -40,6 +43,7 @@ export async function createPost(req, res) {
     const createdPost = await Post.create(postData);
 
     if (!createdPost) {
+      //  console.log("i think we are  no good")
       return res.status(500).json({
         success: false,
         message: 'Something went wrong while creating post',
@@ -47,6 +51,7 @@ export async function createPost(req, res) {
     }
 
     // Populate user details
+    // console.log("i think we are good")
     await createdPost.populate('user', 'username avatar');
 
     // Update user's posts count

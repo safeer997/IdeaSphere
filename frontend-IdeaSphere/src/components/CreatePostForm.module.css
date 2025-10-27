@@ -1,0 +1,38 @@
+.postForm {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+textarea {
+  width: 100%;
+  min-height: 60px;
+  padding: 8px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  resize: vertical;
+}
+
+input[type="file"] {
+  margin-top: 4px;
+}
+
+button {
+  width: fit-content;
+  padding: 6px 12px;
+  border-radius: 20px;
+  border: none;
+  background-color: #1d9bf0;
+  color: white;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #0c85d0;
+}
+
+.error {
+  color: red;
+  font-size: 14px;
+}
