@@ -1,0 +1,56 @@
+.tabsContainer {
+  position: relative;
+  background-color: #ffffff;
+  border-bottom: 1px solid #eff3f4;
+  margin-bottom: 0;
+  border-radius: 16px 16px 0 0;
+  overflow: hidden;
+}
+
+.tabs {
+  display: flex;
+  width: 100%;
+  position: relative;
+}
+
+.tabButton {
+  flex: 1;
+  padding: 16px 0;
+  background: none;
+  border: none;
+  color: #536471;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: color 0.2s, background-color 0.2s;
+  position: relative;
+}
+
+.tabButton:hover {
+  background-color: #f7f9fa;
+  color: #1d9bf0;
+}
+
+.tabButton.active {
+  color: #1d9bf0;
+  font-weight: 700;
+}
+
+/* Animated underline indicator */
+.activeIndicator {
+  position: absolute;
+  bottom: 0;
+  width: 25%;
+  height: 4px;
+  background-color: #1d9bf0;
+  border-radius: 2px;
+  transition: left 0.3s ease-in-out;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  .tabButton {
+    padding: 14px 0;
+    font-size: 14px;
+  }
+}

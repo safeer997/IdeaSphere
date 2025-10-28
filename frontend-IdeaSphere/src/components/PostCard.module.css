@@ -1,26 +1,205 @@
 .postCard {
-  border: 1px solid #ccc;
-  padding: 12px;
-  border-radius: 8px;
+  background-color: #ffffff;
+  border: 1px solid #eff3f4;
+  border-radius: 12px;
+  padding: 16px;
   margin-bottom: 12px;
-  background-color: #fff;
+  transition: background-color 0.2s;
+  cursor: pointer;
 }
 
+.postCard:hover {
+  background-color: #f7f9fa;
+}
+
+/* Post Header */
 .postHeader {
   display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 8px;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 12px;
 }
 
 .avatar {
-  width: 40px;
-  height: 40px;
+  width: 48px;
+  height: 48px;
   border-radius: 50%;
+  object-fit: cover;
+  background-color: #e1e8ed;
+}
+
+.userInfo {
+  flex: 1;
+}
+
+.nameRow {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+}
+
+.username {
+  color: #14171a;
+  font-weight: 700;
+  font-size: 15px;
+}
+
+.verified {
+  color: #1d9bf0;
+  font-size: 13px;
+}
+
+.timestamp {
+  color: #536471;
+  font-weight: 400;
+  margin-left: auto;
+}
+
+/* Post Content */
+.content {
+  color: #14171a;
+  font-size: 15px;
+  line-height: 1.5;
+  margin: 0 0 12px 0;
+  word-wrap: break-word;
+}
+
+/* Media Container */
+.mediaContainer {
+  margin-bottom: 12px;
+  border-radius: 12px;
+  overflow: hidden;
 }
 
 .postMedia {
-  margin-top: 8px;
-  max-width: 100%;
-  border-radius: 8px;
+  width: 100%;
+  height: auto;
+  max-height: 400px;
+  object-fit: cover;
+  border-radius: 12px;
+  background-color: #e1e8ed;
+}
+
+/* Post Stats */
+.stats {
+  display: flex;
+  gap: 16px;
+  padding: 12px 0;
+  border-top: 1px solid #eff3f4;
+  border-bottom: 1px solid #eff3f4;
+  font-size: 13px;
+  color: #536471;
+  margin-bottom: 8px;
+}
+
+.stats span {
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.stats span:hover {
+  color: #1d9bf0;
+}
+
+/* Action Buttons */
+.actions {
+  display: flex;
+  justify-content: space-around;
+  gap: 8px;
+}
+
+.actionButton {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 50%;
+  color: #536471;
+  font-size: 14px;
+  transition: all 0.2s;
+}
+
+.actionButton:hover {
+  background-color: rgba(29, 155, 240, 0.1);
+}
+
+/* Reply Button */
+.replyButton:hover {
+  color: #1d9bf0;
+}
+
+/* Retweet Button */
+.retweetButton:hover {
+  color: #17bf63;
+}
+
+/* Like Button */
+.likeButton:hover {
+  color: #e74c3c;
+}
+
+.likeButton.liked {
+  color: #e74c3c;
+}
+
+.likeButton.liked .icon {
+  animation: heartBeat 0.3s ease-in-out;
+}
+
+@keyframes heartBeat {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.2);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* Share Button */
+.shareButton:hover {
+  color: #1d9bf0;
+}
+
+.icon {
+  font-size: 16px;
+}
+
+.count {
+  font-size: 13px;
+  min-width: 24px;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  .postCard {
+    border-radius: 8px;
+    padding: 12px;
+    margin-bottom: 8px;
+  }
+
+  .avatar {
+    width: 40px;
+    height: 40px;
+  }
+
+  .username {
+    font-size: 14px;
+  }
+
+  .content {
+    font-size: 14px;
+  }
+
+  .timestamp {
+    font-size: 12px;
+  }
 }

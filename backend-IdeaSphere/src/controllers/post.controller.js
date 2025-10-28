@@ -5,8 +5,8 @@ export async function createPost(req, res) {
   const { content } = req.body;
   const userId = req.user.id;
 
-  console.log('content : ', content);
-  console.log('userId : ', userId);
+  // console.log('content : ', content);
+  // console.log('userId : ', userId);
 
   try {
     // Validate content

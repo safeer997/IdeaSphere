@@ -2,6 +2,7 @@ import { createBrowserRouter } from 'react-router-dom';
 import LandingPage from '../pages/auth/LandingPage.jsx';
 import Dashboard from '../pages/dashboard/Dashboard.jsx';
 import ProtectedRoute from '../components/ProtectedRoute.jsx';
+import ProfilePage from '../pages/profile/ProfilePage.jsx';
 
 const router = createBrowserRouter([
   {
@@ -14,6 +15,14 @@ const router = createBrowserRouter([
       <ProtectedRoute>
         <Dashboard />
       </ProtectedRoute>
+    ),
+  },
+  {
+    path: '/profile',
+    element: (
+      // <ProtectedRoute>
+      <ProfilePage />
+      // </ProtectedRoute>
     ),
   },
 ]);
