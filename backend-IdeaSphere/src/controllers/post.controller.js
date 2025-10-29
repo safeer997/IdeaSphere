@@ -1,12 +1,10 @@
 import { Post } from '../models/post.model.js';
 import { User } from '../models/user.model.js';
+import { Like } from '../models/like.model.js';
 
 export async function createPost(req, res) {
   const { content } = req.body;
   const userId = req.user.id;
-
-  // console.log('content : ', content);
-  // console.log('userId : ', userId);
 
   try {
     // Validate content
@@ -43,7 +41,6 @@ export async function createPost(req, res) {
     const createdPost = await Post.create(postData);
 
     if (!createdPost) {
-      //  console.log("i think we are  no good")
       return res.status(500).json({
         success: false,
         message: 'Something went wrong while creating post',
@@ -51,16 +48,21 @@ export async function createPost(req, res) {
     }
 
     // Populate user details
-    // console.log("i think we are good")
-    await createdPost.populate('user', 'username avatar');
+    await createdPost.populate('user', 'username avatar isVerified');
 
     // Update user's posts count
     await User.findByIdAndUpdate(userId, { $inc: { postsCount: 1 } });
 
+    // Add liked field (false for newly created post)
+    const postWithLikeStatus = {
+      ...createdPost.toObject(),
+      liked: false,
+    };
+
     return res.status(201).json({
       success: true,
       message: 'Post created successfully',
-      data: createdPost,
+      data: postWithLikeStatus,
     });
   } catch (error) {
     console.log(error);
@@ -73,13 +75,18 @@ export async function createPost(req, res) {
 
 export async function getPost(req, res) {
   const { postId } = req.params;
+  const userId = req.user?.id;
 
   try {
     const post = await Post.findById(postId)
-      .populate('user', 'username avatar bio')
+      .populate('user', 'username avatar bio isVerified')
       .populate({
         path: 'parentPost',
-        populate: { path: 'user', select: 'username avatar' },
+        populate: { path: 'user', select: 'username avatar isVerified' },
+      })
+      .populate({
+        path: 'originalPost',
+        populate: { path: 'user', select: 'username avatar isVerified' },
       });
 
     if (!post) {
@@ -89,9 +96,21 @@ export async function getPost(req, res) {
       });
     }
 
+    // Check if current user liked this post
+    let liked = false;
+    if (userId) {
+      const likeExists = await Like.exists({ user: userId, post: postId });
+      liked = !!likeExists;
+    }
+
+    const postWithLikeStatus = {
+      ...post.toObject(),
+      liked,
+    };
+
     return res.status(200).json({
       success: true,
-      data: post,
+      data: postWithLikeStatus,
     });
   } catch (error) {
     console.log(error);
@@ -108,18 +127,33 @@ export async function getAllPosts(req, res) {
     const limit = parseInt(req.query.limit) || 20;
     const skip = (page - 1) * limit;
 
+    const userId = req.user?.id; // Get current user ID if authenticated
+
     const posts = await Post.find()
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(limit)
-      .populate('user', 'username avatar')
+      .populate('user', 'username avatar isVerified')
       .lean();
+
+    // Get all liked post IDs by current user (if authenticated)
+    let likedPostIds = [];
+    if (userId) {
+      const likedDocs = await Like.find({ user: userId }).select('post').lean();
+      likedPostIds = likedDocs.map(doc => doc.post.toString());
+    }
+
+    // Add liked field to each post
+    const postsWithLikeStatus = posts.map(post => ({
+      ...post,
+      liked: likedPostIds.includes(post._id.toString()),
+    }));
 
     const total = await Post.countDocuments();
 
     return res.status(200).json({
       success: true,
-      data: posts,
+      data: postsWithLikeStatus,
       pagination: {
         page,
         limit,
@@ -138,6 +172,7 @@ export async function getAllPosts(req, res) {
 
 export async function getUserPosts(req, res) {
   const { userId } = req.params;
+  const currentUserId = req.user?.id; // Get current user ID if authenticated
 
   try {
     const page = parseInt(req.query.page) || 1;
@@ -156,14 +191,27 @@ export async function getUserPosts(req, res) {
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(limit)
-      .populate('user', 'username avatar')
+      .populate('user', 'username avatar isVerified')
       .lean();
+
+    // Get all liked post IDs by current user (if authenticated)
+    let likedPostIds = [];
+    if (currentUserId) {
+      const likedDocs = await Like.find({ user: currentUserId }).select('post').lean();
+      likedPostIds = likedDocs.map(doc => doc.post.toString());
+    }
+
+    // Add liked field to each post
+    const postsWithLikeStatus = posts.map(post => ({
+      ...post,
+      liked: likedPostIds.includes(post._id.toString()),
+    }));
 
     const total = await Post.countDocuments({ user: userId });
 
     return res.status(200).json({
       success: true,
-      data: posts,
+      data: postsWithLikeStatus,
       pagination: {
         page,
         limit,
@@ -183,7 +231,7 @@ export async function getUserPosts(req, res) {
 export async function updatePost(req, res) {
   const { postId } = req.params;
   const { content } = req.body;
-  const userId = req.user._id;
+  const userId = req.user.id;
 
   try {
     if (!content || content.trim() === '') {
@@ -218,12 +266,19 @@ export async function updatePost(req, res) {
 
     post.content = content.trim();
     await post.save();
-    await post.populate('user', 'username avatar');
+    await post.populate('user', 'username avatar isVerified');
+
+    // Add liked field (false for updated post, or check if current user liked it)
+    const likeExists = await Like.exists({ user: userId, post: postId });
+    const postWithLikeStatus = {
+      ...post.toObject(),
+      liked: !!likeExists,
+    };
 
     return res.status(200).json({
       success: true,
       message: 'Post updated successfully',
-      data: post,
+      data: postWithLikeStatus,
     });
   } catch (error) {
     console.log(error);
@@ -236,7 +291,7 @@ export async function updatePost(req, res) {
 
 export async function deletePost(req, res) {
   const { postId } = req.params;
-  const userId = req.user._id;
+  const userId = req.user.id;
 
   try {
     const post = await Post.findById(postId);
