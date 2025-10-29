@@ -1,14 +1,63 @@
 import { useState } from 'react';
+import { likePost, unlikePost } from '../api/likeApi.js';
 import styles from './PostCard.module.css';
 
 const PostCard = ({ post, onLike, onReply, onRetweet }) => {
   const [liked, setLiked] = useState(post.liked || false);
   const [likesCount, setLikesCount] = useState(post.likesCount || 0);
+  const [isLiking, setIsLiking] = useState(false);
+  const [error, setError] = useState(null);
 
-  const handleLike = () => {
-    setLiked(!liked);
-    setLikesCount(liked ? likesCount - 1 : likesCount + 1);
-    if (onLike) onLike(post._id, !liked);
+  const handleLike = async () => {
+    console.log("Post being liked :",post)
+     console.log("like status :",liked)
+
+    if (isLiking) {
+      console.log("user is likeing :::::")
+      return ;
+    }
+
+    setIsLiking(true);
+    setError(null);
+
+    const previousLiked = liked;
+    console.log("previous liked:",previousLiked)
+    const previousCount = likesCount;
+    
+    const newLiked = !liked;
+     console.log("new liked:",newLiked);
+    const newCount = liked ? likesCount - 1 : likesCount + 1;
+
+    // Optimistic update
+    setLiked(newLiked);
+    setLikesCount(newCount);
+
+    try {
+      const res = previousLiked ? await unlikePost(post._id) : await likePost(post._id);
+      console.log("response :",res)
+      console.log("post status :",post)
+
+
+      if (res.success) {
+        console.log('Like/Unlike successful:', res.message);
+        // Notify parent with postId, liked status, and new count
+        if (onLike) onLike(post._id, newLiked, newCount);
+      } else {
+        // Revert on error
+        setLiked(previousLiked);
+        setLikesCount(previousCount);
+        setError(res.message);
+        console.error('Like error:', res.message);
+      }
+    } catch (err) {
+      // Revert on error
+      setLiked(previousLiked);
+      setLikesCount(previousCount);
+      setError('Something went wrong');
+      console.error('Like request failed:', err);
+    } finally {
+      setIsLiking(false);
+    }
   };
 
   const handleReply = () => {
@@ -19,7 +68,6 @@ const PostCard = ({ post, onLike, onReply, onRetweet }) => {
     if (onRetweet) onRetweet(post._id);
   };
 
-  // Format date
   const formatDate = (date) => {
     const now = new Date();
     const postDate = new Date(date);
@@ -37,7 +85,6 @@ const PostCard = ({ post, onLike, onReply, onRetweet }) => {
 
   return (
     <div className={styles.postCard}>
-      {/* Post Header */}
       <div className={styles.postHeader}>
         <img src={post.user?.avatar} alt="avatar" className={styles.avatar} />
         <div className={styles.userInfo}>
@@ -53,10 +100,8 @@ const PostCard = ({ post, onLike, onReply, onRetweet }) => {
         </div>
       </div>
 
-      {/* Post Content */}
       <p className={styles.content}>{post.content}</p>
 
-      {/* Post Media */}
       {post.media && post.media.length > 0 && (
         <div className={styles.mediaContainer}>
           {post.media.map((media, index) => (
@@ -70,18 +115,23 @@ const PostCard = ({ post, onLike, onReply, onRetweet }) => {
         </div>
       )}
 
-      {/* Post Stats */}
       <div className={styles.stats}>
         <span>{post.viewsCount || 0} Views</span>
         <span>{post.retweetsCount || 0} Retweets</span>
         <span>{post.repliesCount || 0} Replies</span>
       </div>
 
-      {/* Action Buttons */}
+      {error && (
+        <div className={styles.errorMessage}>
+          {error}
+        </div>
+      )}
+
       <div className={styles.actions}>
         <button
           className={`${styles.actionButton} ${styles.replyButton}`}
           onClick={handleReply}
+          disabled={isLiking}
           title="Reply"
         >
           <span className={styles.icon}>💬</span>
@@ -91,6 +141,7 @@ const PostCard = ({ post, onLike, onReply, onRetweet }) => {
         <button
           className={`${styles.actionButton} ${styles.retweetButton}`}
           onClick={handleRetweet}
+          disabled={isLiking}
           title="Retweet"
         >
           <span className={styles.icon}>🔄</span>
@@ -102,14 +153,18 @@ const PostCard = ({ post, onLike, onReply, onRetweet }) => {
             liked ? styles.liked : ''
           }`}
           onClick={handleLike}
-          title="Like"
+          disabled={isLiking}
+          title={liked ? 'Unlike' : 'Like'}
         >
-          <span className={styles.icon}>{liked ? '❤️' : '🤍'}</span>
+          <span className={`${styles.icon} ${isLiking ? styles.spinning : ''}`}>
+            {liked ? '❤️' : '🤍'}
+          </span>
           <span className={styles.count}>{likesCount}</span>
         </button>
 
         <button
           className={`${styles.actionButton} ${styles.shareButton}`}
+          disabled={isLiking}
           title="Share"
         >
           <span className={styles.icon}>📤</span>

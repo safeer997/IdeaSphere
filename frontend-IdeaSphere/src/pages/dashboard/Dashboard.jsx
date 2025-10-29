@@ -16,7 +16,6 @@ const Dashboard = () => {
     loading: authLoading,
   } = useSelector((state) => state.auth);
 
-
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -29,6 +28,7 @@ const Dashboard = () => {
   const loadPosts = async () => {
     setLoading(true);
     const res = await getPosts();
+    console.log("data fetched by get posts: ", res);
     if (res.success) {
       setPosts(res.data);
       setError(null);
@@ -51,6 +51,18 @@ const Dashboard = () => {
     setPosts((prev) => [newPost, ...prev]);
   };
 
+  // Handle like updates from PostFeed
+  const handlePostsUpdate = (postId, liked, newCount) => {
+    console.log('Updating post:', postId, 'liked:', liked, 'count:', newCount);
+    setPosts(prevPosts =>
+      prevPosts.map(post =>
+        post._id === postId
+          ? { ...post, liked, likesCount: newCount }
+          : post
+      )
+    );
+  };
+
   if (authLoading || loading)
     return <div className={styles.container}>Loading...</div>;
 
@@ -63,7 +75,11 @@ const Dashboard = () => {
 
       <CreatePostForm onPostCreated={handlePostCreated} />
       {error && <p style={{ color: 'red' }}>{error}</p>}
-      <PostFeed posts={posts} />
+
+      <PostFeed 
+        posts={posts} 
+        onPostsUpdate={handlePostsUpdate} 
+      />
     </div>
   );
 };

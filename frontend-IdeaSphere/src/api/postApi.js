@@ -3,7 +3,10 @@ const API_BASE = 'http://localhost:7000/api/v1/post';
 // -------------------- Get All Posts --------------------
 export async function getPosts() {
   try {
-    const response = await fetch(`${API_BASE}`);
+    const response = await fetch(`${API_BASE}`, {
+      credentials: 'include', // ← Add this to send cookies
+    });
+    
     if (!response.ok) {
       const errorDetails = await response.json().catch(() => {});
       throw new Error(
@@ -12,11 +15,14 @@ export async function getPosts() {
       );
     }
     const data = await response.json();
-    return { success: true, data: data.data }; // data.data contains array of posts
+    return { success: true, data: data.data };
   } catch (error) {
     return { success: false, message: error.message };
   }
 }
+
+// Keep your other functions as they are (createPost, deletePost, updatePost)
+
 
 // -------------------- Create Post --------------------
 export async function createPost(content, mediaFile) {

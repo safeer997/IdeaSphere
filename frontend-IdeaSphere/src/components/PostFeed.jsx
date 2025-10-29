@@ -1,143 +1,8 @@
 import { useState, useEffect } from 'react';
 import PostCard from './PostCard.jsx';
+import { getUserLikes } from '../api/likeApi.js';
+import { getUserPosts } from '../api/userApi.js';
 import styles from './PostFeed.module.css';
-
-// Mock data - move outside component to avoid recreating on each render
-const MOCK_POSTS = {
-  posts: [
-    {
-      _id: '1',
-      user: {
-        _id: '123',
-        username: 'safeer alam',
-        avatar: 'https://i.pravatar.cc/150?img=12',
-        isVerified: true,
-      },
-      content: '🚀 Just launched the new dark mode UI for IdeaSphere!',
-      media: [
-        {
-          type: 'image',
-          url: 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97',
-        }
-      ],
-      likesCount: 156,
-      repliesCount: 23,
-      retweetsCount: 45,
-      viewsCount: 1240,
-      isReply: false,
-      isRetweet: false,
-      createdAt: new Date(Date.now() - 2 * 60 * 60 * 1000),
-      liked: false,
-    },
-    {
-      _id: '2',
-      user: {
-        _id: '123',
-        username: 'safeer alam',
-        avatar: 'https://i.pravatar.cc/150?img=12',
-        isVerified: true,
-      },
-      content: 'JavaScript tip: Always use const by default, let when you need to reassign, avoid var.',
-      media: [],
-      likesCount: 342,
-      repliesCount: 67,
-      retweetsCount: 123,
-      viewsCount: 5430,
-      isReply: false,
-      isRetweet: false,
-      createdAt: new Date(Date.now() - 5 * 60 * 60 * 1000),
-      liked: false,
-    },
-    {
-      _id: '3',
-      user: {
-        _id: '123',
-        username: 'safeer alam',
-        avatar: 'https://i.pravatar.cc/150?img=12',
-        isVerified: true,
-      },
-      content: 'Building in public is scary but rewarding. Shoutout to everyone sharing their journey! 🙌',
-      media: [],
-      likesCount: 89,
-      repliesCount: 12,
-      retweetsCount: 34,
-      viewsCount: 890,
-      isReply: false,
-      isRetweet: false,
-      createdAt: new Date(Date.now() - 24 * 60 * 60 * 1000),
-      liked: true,
-    }
-  ],
-  replies: [
-    {
-      _id: '101',
-      user: {
-        _id: '123',
-        username: 'safeer alam',
-        avatar: 'https://i.pravatar.cc/150?img=12',
-        isVerified: true,
-      },
-      content: 'Great article! Adding to my reading list.',
-      media: [],
-      likesCount: 24,
-      repliesCount: 5,
-      retweetsCount: 8,
-      viewsCount: 240,
-      isReply: true,
-      parentPost: '999',
-      isRetweet: false,
-      createdAt: new Date(Date.now() - 3 * 60 * 60 * 1000),
-      liked: false,
-    }
-  ],
-  media: [
-    {
-      _id: '201',
-      user: {
-        _id: '123',
-        username: 'safeer alam',
-        avatar: 'https://i.pravatar.cc/150?img=12',
-        isVerified: true,
-      },
-      content: 'New design mockup for IdeaSphere',
-      media: [
-        {
-          type: 'image',
-          url: 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97',
-        }
-      ],
-      likesCount: 156,
-      repliesCount: 23,
-      retweetsCount: 45,
-      viewsCount: 1240,
-      isReply: false,
-      isRetweet: false,
-      createdAt: new Date(Date.now() - 2 * 60 * 60 * 1000),
-      liked: false,
-    }
-  ],
-  likes: [
-    {
-      _id: '301',
-      user: {
-        _id: 'other_user_id',
-        username: 'another_user',
-        avatar: 'https://i.pravatar.cc/150?img=5',
-        isVerified: false,
-      },
-      content: 'React hooks are game-changing. Here\'s my complete guide...',
-      media: [],
-      likesCount: 523,
-      repliesCount: 89,
-      retweetsCount: 234,
-      viewsCount: 5234,
-      isReply: false,
-      isRetweet: false,
-      createdAt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
-      liked: true,
-    }
-  ]
-};
 
 const PostFeed = ({ 
   posts = [],
@@ -146,14 +11,15 @@ const PostFeed = ({
   onRetry = null,
   activeTab = null,
   userId = null,
-  fetchFeedData = null
+  fetchFeedData = null,
+  onPostsUpdate = null
 }) => {
   const [feedPosts, setFeedPosts] = useState(posts);
   const [isLoading, setIsLoading] = useState(loading);
   const [hasError, setHasError] = useState(error);
 
   useEffect(() => {
-    // If fetchFeedData function is provided (ProfilePage use case)
+    // If fetchFeedData function is provided (ProfilePage use case with tabs)
     if (fetchFeedData && userId && activeTab) {
       loadData();
     } else {
@@ -167,21 +33,47 @@ const PostFeed = ({
     setIsLoading(true);
     setHasError(null);
     try {
-      // Simulate API delay
-      await new Promise(resolve => setTimeout(resolve, 300));
-      
-      // Get mock data based on active tab
-      const data = MOCK_POSTS[activeTab] || [];
-      setFeedPosts(data);
+      let res;
+
+      if (activeTab === 'posts') {
+        res = await getUserPosts(userId, 1, 20);
+      } else if (activeTab === 'replies') {
+        res = await getUserPosts(userId, 1, 20);
+      } else if (activeTab === 'media') {
+        res = await getUserPosts(userId, 1, 20);
+      } else if (activeTab === 'likes') {
+        res = await getUserLikes(userId, 1, 20);
+      }
+
+      if (res.success) {
+        setFeedPosts(res.data);
+      } else {
+        setHasError(res.message || 'Failed to load feed');
+      }
     } catch (err) {
       setHasError('Failed to load feed');
-      console.error(err);
+      console.error('Feed load error:', err);
     } finally {
       setIsLoading(false);
     }
   };
 
-  // Loading State
+  const handlePostLikeUpdate = (postId, liked, newCount) => {
+    // Update local state
+    setFeedPosts(prevPosts => 
+      prevPosts.map(post => 
+        post._id === postId 
+          ? { ...post, liked, likesCount: newCount }
+          : post
+      )
+    );
+
+    // Notify parent component if callback exists
+    if (onPostsUpdate) {
+      onPostsUpdate(postId, liked, newCount);
+    }
+  };
+
   if (isLoading) {
     return (
       <div className={styles.feedContainer}>
@@ -193,7 +85,6 @@ const PostFeed = ({
     );
   }
 
-  // Error State
   if (hasError) {
     return (
       <div className={styles.feedContainer}>
@@ -210,26 +101,24 @@ const PostFeed = ({
     );
   }
 
-  // Empty State
   if (!feedPosts || feedPosts.length === 0) {
     return (
       <div className={styles.feedContainer}>
         <div className={styles.emptyState}>
-          <p>No {activeTab} yet</p>
+          <p>No {activeTab || 'posts'} yet</p>
           <span>When you post something, it will show up here.</span>
         </div>
       </div>
     );
   }
 
-  // Render Posts
   return (
     <div className={styles.feed}>
       {feedPosts.map((post) => (
         <PostCard
           key={post._id}
           post={post}
-          onLike={(postId, liked) => console.log('Like:', postId, liked)}
+          onLike={handlePostLikeUpdate}
           onReply={(postId) => console.log('Reply:', postId)}
           onRetweet={(postId) => console.log('Retweet:', postId)}
         />

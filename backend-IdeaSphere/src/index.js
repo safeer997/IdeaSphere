@@ -33,10 +33,12 @@ app.use(passport.session());
 import authRoutes from './routes/auth.route.js';
 import postRoutes from './routes/post.route.js';
 import followRoutes from './routes/follow.route.js';
+import likeRoutes from './routes/like.route.js';
 
 app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/post', postRoutes);
 app.use('/api/v1/follow', followRoutes);
+app.use('/api/v1/like', likeRoutes);
 
 const PORT = process.env.PORT || 4000;
 try {

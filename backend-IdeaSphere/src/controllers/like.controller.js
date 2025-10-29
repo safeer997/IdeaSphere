@@ -8,6 +8,9 @@ export async function likePost(req, res) {
   const { postId } = req.params;
   const userId = req.user.id;
 
+  // console.log("post id in backend :",postId)
+  // console.log("user id in backend :",userId)
+
   try {
     // Check if post exists
     const post = await Post.findById(postId);
