@@ -17,7 +17,6 @@ export async function likePost(postId) {
     }
 
     const data = await response.json();
-    console.log("data in api call :",data)
     return { success: true, message: data.message };
   } catch (error) {
     return { success: false, message: error.message };

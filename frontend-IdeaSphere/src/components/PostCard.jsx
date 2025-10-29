@@ -9,19 +9,16 @@ const PostCard = ({ post, onLike, onReply, onRetweet }) => {
   const [error, setError] = useState(null);
 
   const handleLike = async () => {
-
     if (isLiking) {
-      return ;
+      return;
     }
-
     setIsLiking(true);
     setError(null);
 
     const previousLiked = liked;
     const previousCount = likesCount;
-    
+
     const newLiked = !liked;
-   
     const newCount = liked ? likesCount - 1 : likesCount + 1;
 
     // Optimistic update
@@ -29,10 +26,9 @@ const PostCard = ({ post, onLike, onReply, onRetweet }) => {
     setLikesCount(newCount);
 
     try {
-      const res = previousLiked ? await unlikePost(post._id) : await likePost(post._id);
-      console.log("response :",res)
-      console.log("post status :",post)
-
+      const res = previousLiked
+        ? await unlikePost(post._id)
+        : await likePost(post._id);
 
       if (res.success) {
         console.log('Like/Unlike successful:', res.message);
@@ -82,7 +78,7 @@ const PostCard = ({ post, onLike, onReply, onRetweet }) => {
   return (
     <div className={styles.postCard}>
       <div className={styles.postHeader}>
-        <img src={post.user?.avatar} alt="avatar" className={styles.avatar} />
+        <img src={post.user?.avatar} alt='avatar' className={styles.avatar} />
         <div className={styles.userInfo}>
           <div className={styles.nameRow}>
             <strong className={styles.username}>{post.user?.username}</strong>
@@ -104,7 +100,7 @@ const PostCard = ({ post, onLike, onReply, onRetweet }) => {
             <img
               key={index}
               src={media.url}
-              alt="post-media"
+              alt='post-media'
               className={styles.postMedia}
             />
           ))}
@@ -117,18 +113,14 @@ const PostCard = ({ post, onLike, onReply, onRetweet }) => {
         <span>{post.repliesCount || 0} Replies</span>
       </div>
 
-      {error && (
-        <div className={styles.errorMessage}>
-          {error}
-        </div>
-      )}
+      {error && <div className={styles.errorMessage}>{error}</div>}
 
       <div className={styles.actions}>
         <button
           className={`${styles.actionButton} ${styles.replyButton}`}
           onClick={handleReply}
           disabled={isLiking}
-          title="Reply"
+          title='Reply'
         >
           <span className={styles.icon}>💬</span>
           <span className={styles.count}>{post.repliesCount || 0}</span>
@@ -138,7 +130,7 @@ const PostCard = ({ post, onLike, onReply, onRetweet }) => {
           className={`${styles.actionButton} ${styles.retweetButton}`}
           onClick={handleRetweet}
           disabled={isLiking}
-          title="Retweet"
+          title='Retweet'
         >
           <span className={styles.icon}>🔄</span>
           <span className={styles.count}>{post.retweetsCount || 0}</span>
@@ -157,7 +149,6 @@ const PostCard = ({ post, onLike, onReply, onRetweet }) => {
           </span>
           <span className={styles.count}>{likesCount}</span>
         </button>
-
       </div>
     </div>
   );

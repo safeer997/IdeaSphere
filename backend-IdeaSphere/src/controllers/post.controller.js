@@ -127,8 +127,8 @@ export async function getAllPosts(req, res) {
     const limit = parseInt(req.query.limit) || 20;
     const skip = (page - 1) * limit;
 
-    const userId = req.user?.id; 
-    
+    const userId = req.user?.id;
+
     // console.log('Current user ID:', userId);
     // console.log('User object:', req.user);
 
@@ -143,18 +143,14 @@ export async function getAllPosts(req, res) {
     let likedPostIds = [];
     if (userId) {
       const likedDocs = await Like.find({ user: userId }).select('post').lean();
-      // console.log('Liked docs found:', likedDocs.length);
-      // console.log('Liked docs:', likedDocs);
-      
-      likedPostIds = likedDocs.map(doc => doc.post.toString());
+      likedPostIds = likedDocs.map((doc) => doc.post.toString());
     } else {
       console.log('No userId provided');
     }
 
     // Add liked field to each post
-    const postsWithLikeStatus = posts.map(post => {
+    const postsWithLikeStatus = posts.map((post) => {
       const isLiked = likedPostIds.includes(post._id.toString());
-      console.log(`Post ${post._id}: liked=${isLiked}`);
       return {
         ...post,
         liked: isLiked,
@@ -181,7 +177,6 @@ export async function getAllPosts(req, res) {
     });
   }
 }
-
 
 export async function getUserPosts(req, res) {
   const { userId } = req.params;
@@ -210,12 +205,14 @@ export async function getUserPosts(req, res) {
     // Get all liked post IDs by current user (if authenticated)
     let likedPostIds = [];
     if (currentUserId) {
-      const likedDocs = await Like.find({ user: currentUserId }).select('post').lean();
-      likedPostIds = likedDocs.map(doc => doc.post.toString());
+      const likedDocs = await Like.find({ user: currentUserId })
+        .select('post')
+        .lean();
+      likedPostIds = likedDocs.map((doc) => doc.post.toString());
     }
 
     // Add liked field to each post
-    const postsWithLikeStatus = posts.map(post => ({
+    const postsWithLikeStatus = posts.map((post) => ({
       ...post,
       liked: likedPostIds.includes(post._id.toString()),
     }));

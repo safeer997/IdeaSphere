@@ -28,7 +28,7 @@ const Dashboard = () => {
   const loadPosts = async () => {
     setLoading(true);
     const res = await getPosts();
-    console.log("data fetched by get posts: ", res);
+    // console.log("data fetched by get posts: ", res);
     if (res.success) {
       setPosts(res.data);
       setError(null);
@@ -53,7 +53,6 @@ const Dashboard = () => {
 
   // Handle like updates from PostFeed
   const handlePostsUpdate = (postId, liked, newCount) => {
-    console.log('Updating post:', postId, 'liked:', liked, 'count:', newCount);
     setPosts(prevPosts =>
       prevPosts.map(post =>
         post._id === postId
