@@ -9,11 +9,8 @@ const PostCard = ({ post, onLike, onReply, onRetweet }) => {
   const [error, setError] = useState(null);
 
   const handleLike = async () => {
-    console.log("Post being liked :",post)
-     console.log("like status :",liked)
 
     if (isLiking) {
-      console.log("user is likeing :::::")
       return ;
     }
 
@@ -21,11 +18,10 @@ const PostCard = ({ post, onLike, onReply, onRetweet }) => {
     setError(null);
 
     const previousLiked = liked;
-    console.log("previous liked:",previousLiked)
     const previousCount = likesCount;
     
     const newLiked = !liked;
-     console.log("new liked:",newLiked);
+   
     const newCount = liked ? likesCount - 1 : likesCount + 1;
 
     // Optimistic update
@@ -162,13 +158,6 @@ const PostCard = ({ post, onLike, onReply, onRetweet }) => {
           <span className={styles.count}>{likesCount}</span>
         </button>
 
-        <button
-          className={`${styles.actionButton} ${styles.shareButton}`}
-          disabled={isLiking}
-          title="Share"
-        >
-          <span className={styles.icon}>📤</span>
-        </button>
       </div>
     </div>
   );

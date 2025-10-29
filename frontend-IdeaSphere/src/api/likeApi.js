@@ -2,7 +2,6 @@ const API_BASE = 'http://localhost:7000/api/v1/like';
 
 // Like a post
 export async function likePost(postId) {
-  console.log("post id being sent :",postId)
   try {
     const response = await fetch(`${API_BASE}/${postId}`, {
       method: 'POST',
@@ -21,7 +20,6 @@ export async function likePost(postId) {
     console.log("data in api call :",data)
     return { success: true, message: data.message };
   } catch (error) {
-    console.log("Error is here !!!!")
     return { success: false, message: error.message };
   }
 }

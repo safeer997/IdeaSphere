@@ -143,11 +143,10 @@ export async function getAllPosts(req, res) {
     let likedPostIds = [];
     if (userId) {
       const likedDocs = await Like.find({ user: userId }).select('post').lean();
-      console.log('Liked docs found:', likedDocs.length);
-      console.log('Liked docs:', likedDocs);
+      // console.log('Liked docs found:', likedDocs.length);
+      // console.log('Liked docs:', likedDocs);
       
       likedPostIds = likedDocs.map(doc => doc.post.toString());
-      console.log('Liked post IDs:', likedPostIds);
     } else {
       console.log('No userId provided');
     }
