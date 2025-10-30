@@ -1,0 +1,197 @@
+.replyCard {
+  display: block;
+  padding: 12px;
+  background-color: #ffffff;
+  border-radius: 8px;
+  border-left: 3px solid #1d9bf0;
+  margin-bottom: 8px;
+  transition: background-color 0.2s;
+}
+
+.replyCard:hover {
+  background-color: #f7f9fa;
+}
+
+/* Reply Header */
+.replyHeader {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  object-fit: cover;
+  background-color: #e1e8ed;
+  flex-shrink: 0;
+}
+
+.replyMeta {
+  flex: 1;
+  min-width: 0;
+}
+
+.nameRow {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  flex-wrap: wrap;
+}
+
+.username {
+  color: #14171a;
+  font-weight: 700;
+  font-size: 13px;
+}
+
+.verified {
+  color: #1d9bf0;
+  font-size: 12px;
+}
+
+.timestamp {
+  color: #536471;
+  font-weight: 400;
+  font-size: 12px;
+  margin-left: auto;
+}
+
+.replyingTo {
+  font-size: 12px;
+  color: #536471;
+  margin: 4px 0 0 0;
+  display: block;
+}
+
+.replyingTo strong {
+  color: #1d9bf0;
+}
+
+/* Reply Content */
+.content {
+  color: #14171a;
+  font-size: 13px;
+  line-height: 1.4;
+  margin: 8px 0;
+  word-wrap: break-word;
+  word-break: break-word;
+}
+
+/* Media */
+.mediaContainer {
+  margin: 8px 0;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.media {
+  width: 100%;
+  height: auto;
+  max-height: 250px;
+  object-fit: cover;
+  border-radius: 8px;
+  background-color: #e1e8ed;
+  display: block;
+}
+
+/* Reply Actions */
+.replyActions {
+  display: flex;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.likeButton {
+  background: none;
+  border: none;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #536471;
+  cursor: pointer;
+  font-size: 12px;
+  transition: all 0.2s;
+  padding: 4px 8px;
+  border-radius: 4px;
+}
+
+.likeButton:hover:not(:disabled) {
+  color: #e74c3c;
+  background-color: rgba(231, 76, 60, 0.1);
+}
+
+.likeButton.liked {
+  color: #e74c3c;
+}
+
+.likeButton.liked .icon {
+  animation: heartBeat 0.3s ease-in-out;
+}
+
+.likeButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.icon {
+  font-size: 12px;
+  display: inline-block;
+}
+
+.icon.spinning {
+  animation: spin 0.6s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes heartBeat {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.2); }
+  100% { transform: scale(1); }
+}
+
+.count {
+  font-size: 12px;
+  min-width: 20px;
+}
+
+/* Error */
+.error {
+  color: #e74c3c;
+  font-size: 11px;
+  margin: 6px 0 0 0;
+  padding: 4px 6px;
+  background-color: #fee;
+  border-radius: 4px;
+  display: block;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  .replyCard {
+    padding: 10px;
+  }
+
+  .avatar {
+    width: 32px;
+    height: 32px;
+  }
+
+  .username {
+    font-size: 12px;
+  }
+
+  .content {
+    font-size: 12px;
+  }
+
+  .replyingTo {
+    font-size: 11px;
+  }
+}

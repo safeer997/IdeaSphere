@@ -119,7 +119,6 @@ const PostFeed = ({
           key={post._id}
           post={post}
           onLike={handlePostLikeUpdate}
-          onReply={(postId) => console.log('Reply:', postId)}
           onRetweet={(postId) => console.log('Retweet:', postId)}
         />
       ))}
