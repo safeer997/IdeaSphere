@@ -106,3 +106,26 @@ export async function updatePost(postId, content, token) {
     return { success: false, message: error.message };
   }
 }
+
+// Get single post
+export async function getPost(postId) {
+  try {
+    const response = await fetch(`${API_BASE}/${postId}`, {
+      credentials: 'include',
+    });
+
+    if (!response.ok) {
+      const errorDetails = await response.json().catch(() => {});
+      throw new Error(
+        errorDetails?.message || `Failed to fetch post (status ${response.status})`
+      );
+    }
+
+    const data = await response.json();
+    return { success: true, data: data.data };
+  } catch (error) {
+    console.error('Get post error:', error);
+    return { success: false, message: error.message };
+  }
+}
+

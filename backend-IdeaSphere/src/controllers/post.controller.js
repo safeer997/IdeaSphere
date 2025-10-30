@@ -1,6 +1,7 @@
 import { Post } from '../models/post.model.js';
 import { User } from '../models/user.model.js';
 import { Like } from '../models/like.model.js';
+import mongoose from 'mongoose';
 
 export async function createPost(req, res) {
   const { content } = req.body;
@@ -129,10 +130,8 @@ export async function getAllPosts(req, res) {
 
     const userId = req.user?.id;
 
-    // console.log('Current user ID:', userId);
-    // console.log('User object:', req.user);
-
-    const posts = await Post.find()
+    // ONLY fetch original posts (isReply: false)
+    const posts = await Post.find({ isReply: false })
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(limit)
@@ -144,8 +143,6 @@ export async function getAllPosts(req, res) {
     if (userId) {
       const likedDocs = await Like.find({ user: userId }).select('post').lean();
       likedPostIds = likedDocs.map((doc) => doc.post.toString());
-    } else {
-      console.log('No userId provided');
     }
 
     // Add liked field to each post
@@ -157,7 +154,8 @@ export async function getAllPosts(req, res) {
       };
     });
 
-    const total = await Post.countDocuments();
+    // Count only original posts
+    const total = await Post.countDocuments({ isReply: false });
 
     return res.status(200).json({
       success: true,
@@ -178,9 +176,10 @@ export async function getAllPosts(req, res) {
   }
 }
 
+
 export async function getUserPosts(req, res) {
   const { userId } = req.params;
-  const currentUserId = req.user?.id; // Get current user ID if authenticated
+  const currentUserId = req.user?.id;
 
   try {
     const page = parseInt(req.query.page) || 1;
@@ -195,7 +194,8 @@ export async function getUserPosts(req, res) {
       });
     }
 
-    const posts = await Post.find({ user: userId })
+    // ONLY fetch original posts by this user (isReply: false)
+    const posts = await Post.find({ user: userId, isReply: false })
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(limit)
@@ -217,7 +217,8 @@ export async function getUserPosts(req, res) {
       liked: likedPostIds.includes(post._id.toString()),
     }));
 
-    const total = await Post.countDocuments({ user: userId });
+    // Count only original posts by this user
+    const total = await Post.countDocuments({ user: userId, isReply: false });
 
     return res.status(200).json({
       success: true,
@@ -237,6 +238,7 @@ export async function getUserPosts(req, res) {
     });
   }
 }
+
 
 export async function updatePost(req, res) {
   const { postId } = req.params;
@@ -334,6 +336,167 @@ export async function deletePost(req, res) {
     return res.status(500).json({
       success: false,
       message: 'Something went wrong while deleting post',
+    });
+  }
+}
+
+// Reply to a post
+export async function replyToPost(req, res) {
+  const { postId } = req.params;
+  const { content } = req.body;
+  const userId = req.user.id;
+
+  try {
+    // Validate content
+    if (!content || content.trim() === '') {
+      return res.status(400).json({
+        success: false,
+        message: 'Reply content cannot be empty',
+      });
+    }
+
+    if (content.length > 280) {
+      return res.status(400).json({
+        success: false,
+        message: 'Reply content cannot exceed 280 characters',
+      });
+    }
+
+    // Check if parent post exists
+    const parentPost = await Post.findById(postId);
+    if (!parentPost) {
+      return res.status(404).json({
+        success: false,
+        message: 'Post not found',
+      });
+    }
+
+    // Start transaction
+    const session = await mongoose.startSession();
+    session.startTransaction();
+
+    try {
+      // Create reply post
+      const replyData = {
+        user: userId,
+        content: content.trim(),
+        isReply: true,
+        parentPost: postId,
+        media: [],
+      };
+
+      // Handle media if present
+      if (req.file) {
+        replyData.media.push({
+          type: 'image',
+          url: req.file.path,
+        });
+      }
+
+      const reply = await Post.create([replyData], { session });
+
+      // Increment repliesCount on parent post
+      await Post.findByIdAndUpdate(
+        postId,
+        { $inc: { repliesCount: 1 } },
+        { session }
+      );
+
+      // Increment user's posts count
+      await User.findByIdAndUpdate(
+        userId,
+        { $inc: { postsCount: 1 } },
+        { session }
+      );
+
+      await session.commitTransaction();
+
+      // Populate user details
+      await reply[0].populate('user', 'username avatar isVerified');
+      await reply[0].populate('parentPost', 'content user');
+
+      const replyWithLikeStatus = {
+        ...reply[0].toObject(),
+        liked: false,
+      };
+
+      return res.status(201).json({
+        success: true,
+        message: 'Reply created successfully',
+        data: replyWithLikeStatus,
+      });
+    } catch (error) {
+      await session.abortTransaction();
+      throw error;
+    } finally {
+      session.endSession();
+    }
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      success: false,
+      message: 'Something went wrong while creating reply',
+    });
+  }
+}
+
+// Get replies for a post
+export async function getPostReplies(req, res) {
+  const { postId } = req.params;
+  const userId = req.user?.id;
+  const page = parseInt(req.query.page) || 1;
+  const limit = parseInt(req.query.limit) || 20;
+  const skip = (page - 1) * limit;
+
+  try {
+    // Check if parent post exists
+    const parentPost = await Post.findById(postId);
+    if (!parentPost) {
+      return res.status(404).json({
+        success: false,
+        message: 'Post not found',
+      });
+    }
+
+    // Get all replies for this post
+    const replies = await Post.find({ parentPost: postId })
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit)
+      .populate('user', 'username avatar isVerified')
+      .populate('parentPost', 'content user')
+      .lean();
+
+    // Get liked post IDs by current user
+    let likedPostIds = [];
+    if (userId) {
+      const likedDocs = await Like.find({ user: userId }).select('post').lean();
+      likedPostIds = likedDocs.map((doc) => doc.post.toString());
+    }
+
+    // Add liked field to each reply
+    const repliesWithLikeStatus = replies.map((reply) => ({
+      ...reply,
+      liked: likedPostIds.includes(reply._id.toString()),
+    }));
+
+    const total = await Post.countDocuments({ parentPost: postId });
+
+    return res.status(200).json({
+      success: true,
+      data: repliesWithLikeStatus,
+      pagination: {
+        page,
+        limit,
+        total,
+        pages: Math.ceil(total / limit),
+      },
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      success: false,
+      message: 'Something went wrong while fetching replies',
     });
   }
 }

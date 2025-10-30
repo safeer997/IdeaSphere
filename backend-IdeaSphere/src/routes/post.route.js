@@ -6,6 +6,8 @@ import {
   getUserPosts,
   updatePost,
   deletePost,
+  replyToPost,       
+  getPostReplies,    
 } from '../controllers/post.controller.js';
 import { upload } from '../config/cloudinary.js';
 import { handleUploadError } from '../middlewares/upload.middleware.js';
@@ -13,15 +15,13 @@ import { verifyToken } from '../middlewares/verifyToken.middleware.js';
 
 const router = Router();
 
-// -------------------- Routes with Authentication --------------------
-// Add verifyToken to ALL routes so req.user is available
-// This allows us to check which posts the current user has liked
-
+// Get routes
 router.get('/', verifyToken, getAllPosts);
 router.get('/user/:userId', verifyToken, getUserPosts);
 router.get('/:postId', verifyToken, getPost);
+router.get('/:postId/replies', verifyToken, getPostReplies); 
 
-// -------------------- Protected Routes (Create, Update, Delete) --------------------
+// Create routes
 router.post(
   '/',
   verifyToken,
@@ -30,6 +30,15 @@ router.post(
   createPost
 );
 
+router.post(
+  '/:postId/reply',                    
+  verifyToken,
+  upload.single('media'),
+  handleUploadError,
+  replyToPost
+);
+
+// Update/Delete routes
 router.put('/:postId', verifyToken, updatePost);
 router.delete('/:postId', verifyToken, deletePost);
 
